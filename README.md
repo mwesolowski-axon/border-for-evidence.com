@@ -6,7 +6,6 @@ You can quickly apply consistent border colors and a caution pattern using conve
 Currently supported browsers:
 
 - Google Chrome (and other Chromium-based browsers)
-- Mozilla Firefox
 - Microsoft Edge (Chromium)
 
 ---
@@ -17,103 +16,82 @@ Currently supported browsers:
 - Quick color swatches:
   - Red, Blue, Yellow, Purple, Orange, Green
   - Black/Yellow “caution” pattern
+  - Custom stripes
 
 ---
 
-## Installation – Chrome
+## Installation – Chrome (from Chrome Web Store)
+1. Open the Chrome Web Store URL https://chromewebstore.google.com/ and search for the extension "Border for Evidence.com" :
+2. Click Add to Chrome.
+3. Review and confirm the permissions:
 
-You can install the extension in Chrome either as an unpacked extension (developer/testing) or via a packaged `.crx` if provided.
+Note: The Chrome Web Store warns that this extension can “read and change your data on all evidence.com sites” because the extension injects a content script into https://*.evidence.com/* pages in order to draw the border. Technically, any script running in that context could read or change the page, so Chrome uses that generic warning.
+In my implementation, the script only:
+ - Adds a fixed overlay border element, and
+- Stores per‑host visual settings (width, style, colors) in extension storage.
 
-### Option 1: Unpacked (for development / testing)
+It does not collect or transmit page content, evidence, or credentials anywhere.
 
-1. Open Chrome.
-2. Navigate to: `chrome://extensions/`
-3. In the top-right, enable **Developer mode**.
-4. Click **Load unpacked**.
-5. Select the folder containing:
-   - `manifest.json`
-   - `content-script.js` (and any other extension files)
-6. Confirm the extension appears in the list and is **Enabled**.
+4. After installation, pin the extension:
+ - Click the puzzle‑piece icon in the toolbar.
+ - Find “Border for Evidence.com” and click the pin icon.
 
-### Option 2: Packaged `.crx` (if provided)
+## Installation – Microsoft Edge (using the Chrome Web Store listing)
 
-1. Obtain the `border-for-evidence-com.crx` file from your team.
-2. Open `chrome://extensions/`.
-3. Drag and drop the `.crx` file into the page.
-4. Review and accept the permission prompt.
-
----
-
-## Installation – Firefox
-
-For Firefox, you can use **temporary loading** for testing or install a signed `.xpi`/`.zip` build.
-
-### Option 1: Temporary add-on (development / testing)
-
-1. Open Firefox.
-2. Navigate to: `about:debugging#/runtime/this-firefox`
-3. Click **Load Temporary Add-on…**.
-4. In the file picker, select `manifest.json` (or any file within the extension folder).
-5. Firefox will load the extension **until the browser is restarted**.
-
-### Option 2: Signed `.xpi` / `.zip` 
-
-1. Obtain the signed `border-for-evidence-com.xpi` (or `.zip`) file from your team or build pipeline.
-2. Drag and drop the file onto a Firefox window  
-   **or** open `about:addons`, click the gear icon, and choose **Install Add-on From File…**.
-3. Accept the installation prompt.
-
-> In some organizations, Firefox can be centrally managed and extensions distributed via policies; check with your IT admin if needed.
-
----
-
-## Installation – Microsoft Edge (Chromium)
-
-Edge supports Chrome-style extensions.
-
-### Option 1: Unpacked (for development / testing)
-
-1. Open Edge.
-2. Navigate to: `edge://extensions/`
-3. Enable **Developer mode** (toggle in the left menu or top-right).
-4. Click **Load unpacked**.
-5. Select the folder containing:
-   - `manifest.json`
-   - `content-script.js` (and any other extension files)
-6. Confirm the extension is **On** in the list.
-
-### Option 2: From a `.crx` or Edge Add-ons Store
-
-If you have a packaged version:
-
-1. Open `edge://extensions/`.
-2. Drag and drop the `.crx` file into the page and accept the prompt  
-   **or** install from the Microsoft Edge Add-ons store if your team publishes it there.
-
----
+You can install it in Edge directly from the Chrome Web Store:
+1. Open Edge and go to the same Chrome Web Store link.
+2. The first time you do this, Edge will show a banner:
+“Allow extensions from other stores” – click Allow.
+3. On the extension’s page, click Add to Chrome.
+4. Edge will show its own dialog; click Add extension.
+5. Pin the extension:
+Click the puzzle‑piece icon in the Edge toolbar.
+Find “Border for Evidence.com” and click the pin icon.
 
 ## Using Border for Evidence.com
+Open any Evidence.com page (e.g., https://swsstams.evidence.com/...).
+Click the extension’s icon (Axon logo) in the browser toolbar to open the popup.
 
-Once installed:
+### At the top
+- You’ll see the current host (e.g., swsstams.evidence.com) so you know which environment you’re configuring.
 
-1. Navigate to an Evidence.com page (for example, `https://<tenant>.evidence.com/axon/evidence-search`).
-2. Ensure the extension is active for the site:
-   - In some browsers you may need to allow the extension to run on the Evidence.com domain (click the extension icon → **Allow on this site** or similar).
-3. Open the extension settings
-   - A settings gear icon overlayed onto the Evidence.com page UI.
-4. Use the **Color picker** and **color swatches**:
-   - Click a color swatch (red, blue, yellow, purple, orange, green) to set the border.
-   - Click the **black/yellow** swatch to use the caution pattern.
-   - The currently active swatch is visually highlighted.
-5. The border around the targeted Evidence.com area should update immediately.
+## All settings apply to this hostname only.
+### No border
+- “No border for this site”:
 
-Popup and in-page settings integration
-- A browser-action popup (popup.html + popup.js) was added. The popup intentionally reuses the same in-page settings UI — there is no duplicated settings logic.
-- When you click "Open in-page settings" in the popup, the popup sends a message to the content script on the active tab:
-  - The content script responds to messages with { action: 'openSettings' } and calls the same renderSettings() path used by the in-page UI.
-- The in-page settings panel now closes when the user clicks anywhere outside the panel (click-outside behavior).
-- No new host_permissions or extension permissions were added. The extension still limits host access to the existing "https://*.evidence.com/*" host permission and uses the same storage permission ("storage").
-- Implementation notes:
-  - renderSettings() is exposed internally by the content script and invoked by the message listener (chrome.runtime.onMessage).
-  - The popup uses chrome.tabs.sendMessage to request the open; if the active tab is not a matching host, the content script will not be present and popup shows a short inline feedback message.
-  - Storage and UI state behavior remain unchanged (settings are stored per-host via chrome.storage.sync or localStorage fallback).
+Check this if you want to disable the border entirely for the current host.
+
+### Solid color
+ - Color (for solid style):
+
+Use the color picker to choose any color.
+Or type a hex/RGB value (e.g., #c62828, #ffeb3b, rgb(255,0,0)).
+
+### Preset solid swatches below let you quickly pick common colors.
+This style creates a single solid border color.
+
+#### Multi‑Color
+##### Caution
+Click the caution chip to get a yellow/black diagonal “caution tape” border.
+
+##### Custom
+Click the custom chip to enable a two‑color diagonal stripe border.
+ - A “Color A / Color B” section appears:
+ - Click Color A or Color B to choose which stripe you’re editing.
+  - For the active stripe:
+  - Click one of the preset swatches for a quick color, or
+  - Use the color picker, or
+  - Type a hex/RGB value.
+ The small preview chips and the border update immediately as you change colors.
+
+#### Border width
+Border width (px):
+ - Enter a value between 0 and 50.
+The border width changes live as you type.
+
+#### Persistence and scope
+All settings are saved per hostname:
+ - For example, swsstams.evidence.com and inttraining.evidence.com can each have their own width, style, and colors.
+
+Settings automatically re‑apply whenever you load a page on that host.
+ - If your browser profile syncs extension data (e.g., Chrome Sync), these visual preferences may follow you to other devices using the same profile.
