@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Border for Evidence.com</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#111519;--muted:#9fb1c9;--accent:#1f6feb}
+    body{margin:0;font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:var(--bg);color:#e6eef8;width:360px}
+    .wrap{padding:12px}
+    h1{font-size:14px;margin:0 0 8px}
+    label{font-size:12px;color:#cbd5e1;display:block;margin-bottom:6px}
+    .row{display:flex;gap:8px;align-items:center}
+    input[type="text"], input[type="number"]{flex:1;padding:6px;border-radius:4px;border:1px solid #cbd5e1}
+    .swatches{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .sw{width:36px;height:22px;border-radius:4px;cursor:pointer;border:2px solid transparent;box-sizing:border-box}
+    .sw.selected{outline:2px solid #fff;outline-offset:-3px}
+    .controls{background:#111519;padding:10px;border-radius:8px}
+    .footer{font-size:11px;color:var(--muted);margin-top:8px}
+    .row-top{display:flex;justify-content:space-between;align-items:center}
+    .checkbox-label{display:flex;gap:8px;align-items:center}
+    .stripe-swatch{width:32px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;box-sizing:border-box}
+    .stripe-swatch.selected{outline:2px solid #fff;outline-offset:-3px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row-top">
+      <h1>Border for Evidence.com</h1>
+      <div id="hostLbl" style="font-size:12px;color:#b7c7d9"></div>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="checkbox-label" style="margin-bottom:8px">
+        <input id="noBorder" type="checkbox">
+        <label for="noBorder" style="margin:0;color:#e6eef8;font-size:13px">No border for this site</label>
+      </div>
+
+      <label for="color">Solid Color</label>
+      <div class="row">
+        <input id="color" type="color">
+        <input id="hex" type="text" placeholder="#rrggbb or rgb(...)">
+      </div>
+
+      <!-- Solid color swatches -->
+      <div class="swatches" id="swatches">
+        <div class="sw" data-color="#c62828" style="background:#c62828"></div>
+        <div class="sw" data-color="#1e88e5" style="background:#1e88e5"></div>
+        <div class="sw" data-color="#ffeb3b" style="background:#ffeb3b"></div>
+        <div class="sw" data-color="#8e24aa" style="background:#8e24aa"></div>
+        <div class="sw" data-color="#fb8c00" style="background:#fb8c00"></div>
+        <div class="sw" data-color="#43a047" style="background:#43a047"></div>
+      </div>
+
+      <!-- Multi-Color section -->
+      <label>Multi-Color</label>
+      <div class="swatches" id="multiSwatches">
+        <!-- Existing caution pattern -->
+        <div class="sw" data-style="caution"
+             style="background: repeating-linear-gradient(45deg, #ffeb3b 0 10px, #000 10px 20px)"></div>
+        <!-- New custom stripes (defaults red/blue) -->
+        <div class="sw" data-style="custom" id="swCustom"
+             style="background: repeating-linear-gradient(45deg, #c62828 0 10px, #1e88e5 10px 20px)"></div>
+      </div>
+
+      <!-- Controls for custom multi-color stripes -->
+      <div id="customStripeControls" style="display:none; margin-bottom:8px;">
+        <div style="display:flex;gap:8px;margin-bottom:4px;">
+          <div class="stripe-swatch selected" data-stripe="1" id="stripe1"></div>
+          <div class="stripe-swatch" data-stripe="2" id="stripe2"></div>
+        </div>
+
+        <!-- Quick default colors for the active stripe -->
+        <div class="swatches" id="mcSwatches" style="margin-top:0;">
+          <div class="sw" data-color="#c62828" style="background:#c62828"></div>
+          <div class="sw" data-color="#1e88e5" style="background:#1e88e5"></div>
+          <div class="sw" data-color="#ffeb3b" style="background:#ffeb3b"></div>
+          <div class="sw" data-color="#8e24aa" style="background:#8e24aa"></div>
+          <div class="sw" data-color="#fb8c00" style="background:#fb8c00"></div>
+          <div class="sw" data-color="#43a047" style="background:#43a047"></div>
+        </div>
+
+        <div class="row">
+          <input id="mcColor" type="color">
+          <input id="mcHex" type="text" placeholder="#rrggbb or rgb(...)">
+        </div>
+      </div>
+
+      <label for="width">Border width (px)</label>
+      <input id="width" type="number" min="0" max="50" value="8">
+    </div>
+
+    <!-- <div class="footer">Changes apply immediately and are saved per host.</div> -->
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
