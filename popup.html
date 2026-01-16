@@ -21,9 +21,30 @@
     .checkbox-label{display:flex;gap:8px;align-items:center}
     .stripe-swatch{width:32px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;box-sizing:border-box}
     .stripe-swatch.selected{outline:2px solid #fff;outline-offset:-3px}
+
+    .field-group {
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+    .field-group-col {
+      flex:1;
+      background:#020617;
+      padding:4px 6px 8px;
+      border-radius:6px;
+    }
+    .field-group-col label {
+      display:block;
+      margin-bottom:4px;
+    }
+    .field-group-col input[type="number"],
+    .field-group-col input[type="range"] {
+      width:100%;
+    }
   </style>
 </head>
-<body>
+<body style="position: relative;">
   <div class="wrap">
     <div class="row-top">
       <h1>Border for Evidence.com</h1>
@@ -34,6 +55,18 @@
       <div class="checkbox-label" style="margin-bottom:8px">
         <input id="noBorder" type="checkbox">
         <label for="noBorder" style="margin:0;color:#e6eef8;font-size:13px">No border for this site</label>
+      </div>
+
+<!-- New: mode selection -->
+      <div id="modeGroup" style="margin:0 0 8px 22px;font-size:12px;color:#cbd5e1;">
+        <label style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <input type="radio" name="borderMode" id="modeBorder" value="border" checked>
+          <span>Border</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;">
+          <input type="radio" name="borderMode" id="modeBanner" value="banner">
+          <span>Banner</span>
+        </label>
       </div>
 
       <label for="color">Solid Color</label>
@@ -86,12 +119,30 @@
         </div>
       </div>
 
-      <label for="width">Border width (px)</label>
-      <input id="width" type="number" min="0" max="50" value="8">
-    </div>
+      <!-- Border width and opacity controls -->
+      <div class="field-group">
+        <!-- Border width -->
+        <div class="field-group-col">
+          <label for="width">Border width (px)</label>
+          <input id="width" type="number" min="0" max="50" value="8">
+        </div>
+
+        <!-- Opacity -->
+        <div class="field-group-col">
+          <label for="opacity">Opacity (%)</label>
+          <input id="opacity" type="number" min="0" max="100" value="100" style="margin-bottom:4px;">
+          <input id="opacityRange" type="range" min="0" max="100" value="100">
+        </div>
+      </div>
 
     <!-- <div class="footer">Changes apply immediately and are saved per host.</div> -->
   </div>
+  <div id="extension-version-container"
+      style="position: absolute; bottom: 4px; right: 8px; font-size: 10px; color: #888;">
+    <span id="extension-version"></span>
+  </div>
+  
+  <div id="extension-version"></div>
 
   <script src="popup.js"></script>
 </body>

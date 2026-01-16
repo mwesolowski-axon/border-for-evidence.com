@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Border for Evidence.com",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Adds a configurable border around Evidence.com pages.",
   "icons": {
     "16": "icons/axon-16.png",

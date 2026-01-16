@@ -4,7 +4,9 @@ const DEFAULT_SETTINGS = {
   disabled: false,
   style: 'caution', // 'solid', 'caution', or 'custom'
   stripeColor1: '#c62828', // for custom multi-color
-  stripeColor2: '#1e88e5'  // for custom multi-color
+  stripeColor2: '#1e88e5',  // for custom multi-color
+  mode: 'border',           // 'border' (all edges) or 'banner' (top only)
+  opacity: 1                // 0–1, 1 = fully opaque
 };
 
 function getHostKey() { return location.hostname; }
@@ -28,7 +30,10 @@ function applyBorderOverlay(settings) {
     document.documentElement.appendChild(frame);
   }
 
-  const { width, color, style } = settings;
+  const { width, color, style, mode } = settings;
+  const rawOpacity = typeof settings.opacity === 'number' ? settings.opacity : 1;
+  const opacity = Math.max(0, Math.min(1, rawOpacity));
+
   const styleEl = document.getElementById('env-border-overlay-style') || (() => {
     const s = document.createElement('style');
     s.id = 'env-border-overlay-style';
@@ -46,7 +51,12 @@ function applyBorderOverlay(settings) {
   `;
 
   const edges = frame.querySelectorAll('.env-border-edge');
+  const topEdge    = frame.querySelector('.env-border-top');
+  const rightEdge  = frame.querySelector('.env-border-right');
+  const bottomEdge = frame.querySelector('.env-border-bottom');
+  const leftEdge   = frame.querySelector('.env-border-left');
 
+  // Color / pattern
   if (style === 'caution') {
     edges.forEach(e => {
       e.style.background =
@@ -64,6 +74,25 @@ function applyBorderOverlay(settings) {
     edges.forEach(e => {
       e.style.background = color;
     });
+  }
+
+   // Apply opacity to edges
+  edges.forEach(e => {
+    e.style.opacity = String(opacity);
+  });
+  
+  // Mode: full border vs banner (top-only)
+  if (mode === 'banner') {
+    if (topEdge)    topEdge.style.display = 'block';
+    if (rightEdge)  rightEdge.style.display = 'none';
+    if (bottomEdge) bottomEdge.style.display = 'none';
+    if (leftEdge)   leftEdge.style.display = 'none';
+  } else {
+    // default: border (all edges)
+    if (topEdge)    topEdge.style.display = 'block';
+    if (rightEdge)  rightEdge.style.display = 'block';
+    if (bottomEdge) bottomEdge.style.display = 'block';
+    if (leftEdge)   leftEdge.style.display = 'block';
   }
 }
 

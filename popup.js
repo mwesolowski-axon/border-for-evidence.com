@@ -16,6 +16,12 @@ const mcColor               = document.getElementById('mcColor');
 const mcHex                 = document.getElementById('mcHex');
 const mcSwatches            = Array.from(document.querySelectorAll('#mcSwatches .sw'));
 
+const modeBorder = document.getElementById('modeBorder');
+const modeBanner = document.getElementById('modeBanner');
+
+const opacityInput = document.getElementById('opacity');
+const opacityRange = document.getElementById('opacityRange');
+
 let activeHost = null;
 let activeStripe = 1;
 let stripeColor1 = '#c62828';
@@ -48,6 +54,20 @@ function populateUI(settings) {
   color.value      = settings.color || '#c62828';
   hex.value        = settings.color || '#c62828';
 
+  // Opacity (0–1) -> UI percent
+  const op = typeof settings.opacity === 'number' ? settings.opacity : 1;
+  const opPct = Math.round(op * 100);
+  if (opacityInput) opacityInput.value = opPct;
+  if (opacityRange) opacityRange.value = opPct;
+  
+  // Mode (border vs banner)
+  if (settings.mode === 'banner') {
+    modeBanner.checked = true;
+    modeBorder.checked = false;
+  } else {
+    modeBorder.checked = true;
+    modeBanner.checked = false;
+  }
   // Solid swatches selection (for solid style)
   solidSwatches.forEach(s => {
     const c = s.dataset.color;
@@ -86,13 +106,27 @@ function buildSettingsFromUI() {
     else if (st === 'custom') style = 'custom';
   }
 
+  // Mode (border vs banner)
+  const mode = (modeBanner && modeBanner.checked) ? 'banner' : 'border';
+
+  // Opacity percent -> 0–1
+  let opPct = 100;
+  if (opacityInput) {
+    const parsed = parseInt(opacityInput.value || '100', 10);
+    opPct = isNaN(parsed) ? 100 : parsed;
+  }
+  opPct = Math.max(0, Math.min(100, opPct));
+  const opacity = opPct / 100;
+
   return {
     width: Math.max(0, Math.min(50, parseInt(widthInput.value || '8', 10) || 8)),
     color: hex.value || color.value,
     disabled: !!noBorder.checked,
     style,
     stripeColor1,
-    stripeColor2
+    stripeColor2,
+    mode,
+    opacity
   };
 }
 
@@ -137,6 +171,8 @@ function loadForHost(host) {
       style: 'solid',
       stripeColor1: '#c62828',
       stripeColor2: '#1e88e5',
+      mode: 'border',
+      opacity: 1,
       ...s
     };
     populateUI(merged);
@@ -150,6 +186,14 @@ function loadForHost(host) {
 // Toggle border on/off: infrequent, commit immediately
 noBorder.addEventListener('change', () => applyAndSave({ live: false }));
 
+// Mode (border vs banner): commit immediately
+if (modeBorder) {
+  modeBorder.addEventListener('change', () => applyAndSave({ live: false }));
+}
+if (modeBanner) {
+  modeBanner.addEventListener('change', () => applyAndSave({ live: false }));
+}
+
 // WIDTH: live while changing, commit on blur/Enter or popup close
 widthInput.addEventListener('input', () => applyAndSave({ live: true }));
 
@@ -162,6 +206,50 @@ widthInput.addEventListener('keydown', (e) => {
     applyAndSave({ live: false });
   }
 });
+
+// OPACITY number: live on input, commit on blur/Enter
+if (opacityInput && opacityRange) {
+  opacityInput.addEventListener('input', () => {
+    let val = parseInt(opacityInput.value || '100', 10);
+    if (isNaN(val)) val = 100;
+    val = Math.max(0, Math.min(100, val));
+    opacityRange.value = String(val);
+    applyAndSave({ live: true });
+  });
+
+  opacityInput.addEventListener('blur', () => {
+    let val = parseInt(opacityInput.value || '100', 10);
+    if (isNaN(val)) val = 100;
+    val = Math.max(0, Math.min(100, val));
+    opacityInput.value = String(val);
+    opacityRange.value = String(val);
+    applyAndSave({ live: false });
+  });
+
+  opacityInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      let val = parseInt(opacityInput.value || '100', 10);
+      if (isNaN(val)) val = 100;
+      val = Math.max(0, Math.min(100, val));
+      opacityInput.value = String(val);
+      opacityRange.value = String(val);
+      applyAndSave({ live: false });
+    }
+  });
+
+  // OPACITY slider: live while dragging, commit on change
+  opacityRange.addEventListener('input', () => {
+    const val = parseInt(opacityRange.value || '100', 10);
+    opacityInput.value = String(val);
+    applyAndSave({ live: true });
+  });
+
+  opacityRange.addEventListener('change', () => {
+    const val = parseInt(opacityRange.value || '100', 10);
+    opacityInput.value = String(val);
+    applyAndSave({ live: false });
+  });
+}
 
 // COLOR picker (solid): commit immediately
 color.addEventListener('input', () => {
@@ -353,6 +441,16 @@ mcHex.addEventListener('blur', () => {
   applyAndSave({ live: false });
 });
 
+function showExtensionVersion() {
+  const manifest = chrome.runtime.getManifest();
+  if (!manifest || !manifest.version) return;
+
+  const versionEl = document.getElementById('extension-version');
+  if (versionEl) {
+    versionEl.textContent = `Version: ${manifest.version}`;
+  }
+}
+
 // FINAL COMMIT when the popup closes (icon toggled, page clicked, etc.)
 window.addEventListener('unload', () => {
   applyAndSave({ live: false });
@@ -370,4 +468,5 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   } catch (e) {
     hostLbl.textContent = 'Unsupported page';
   }
+  showExtensionVersion();
 });
